@@ -1,70 +1,40 @@
-# Getting Started with Create React App
+# Olena Shyhalevska — Portfolio
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Next.js 16 (App Router, Cache Components) · GSAP 3.15 (ScrollTrigger, SplitText, Flip) · Lenis · Tailwind CSS 4 · Vercel.
 
-## Available Scripts
+## Run locally
 
-In the project directory, you can run:
+```bash
+npm install
+npm run dev     # http://localhost:3000
+npm run build && npm start   # production check
+```
 
-### `npm start`
+## Deploy to Vercel
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Push this folder to a GitHub repository.
+2. In Vercel: **Add New → Project → Import** the repo. Framework preset is detected automatically (Next.js), no build settings needed.
+3. **Settings → Environment Variables**: `NEXT_PUBLIC_SITE_URL = https://resume.dialen.com.ua` (used for canonical URLs, sitemap, OG tags).
+4. **Settings → Domains**: add `resume.dialen.com.ua` and point the DNS record to Vercel (CNAME `cname.vercel-dns.com`).
+5. Optional: enable **Analytics** and **Speed Insights** in the project tabs — the components are already wired in `layout.tsx`.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Or from the CLI: `npx vercel` (preview) and `npx vercel --prod`.
 
-### `npm test`
+## Editing content
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+| What | Where |
+|---|---|
+| Name, contacts, intro, stats, skills, experience, NDA case studies | `src/data/profile.ts` |
+| Projects (titles, stack, links, order, featured) | `src/data/projects.ts` |
+| Project screenshots | `public/work/<slug>.webp` (cover 16:10) and `<slug>-full.webp` (full page) |
+| Image sizes & blur placeholders | `src/data/media.json` (regenerate when adding images) |
+| CV | `public/Olena-Shyhalevska-CV.pdf` |
 
-### `npm run build`
+## Technical notes
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Static by default**: home and all 35 project pages are prerendered at build time (`generateStaticParams`) → served from Vercel's CDN.
+- **Images**: source PNGs (113 MB) were pre-compressed to WebP (9 MB); `next/image` then serves AVIF/WebP at responsive widths with blur placeholders.
+- **Animation**: all GSAP code runs inside `useGSAP` (auto-cleanup) and `gsap.matchMedia`, so `prefers-reduced-motion` users get a static, fully readable site with native scrolling. Heavy effects (pinned horizontal scroll, custom cursor, magnetic buttons) are desktop/fine-pointer only.
+- **Smooth scroll**: Lenis is driven by `gsap.ticker` so it shares one RAF loop with ScrollTrigger.
+- **SEO**: metadata + Open Graph per page, generated OG image, `sitemap.xml`, `robots.txt`, JSON-LD `Person`.
+- **A11y**: skip link, semantic landmarks, focus-visible styles, `aria-pressed` filters, real links and buttons.
