@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Olena Shyhalevska — Portfolio
 
-## Getting Started
+Next.js 16 (App Router, Cache Components) · GSAP 3.15 (ScrollTrigger, SplitText, Flip) · Lenis · Tailwind CSS 4 · Vercel.
 
-First, run the development server:
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000
+npm run build && npm start   # production check
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy to Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Push this folder to a GitHub repository.
+2. In Vercel: **Add New → Project → Import** the repo. Framework preset is detected automatically (Next.js), no build settings needed.
+3. **Settings → Environment Variables**: `NEXT_PUBLIC_SITE_URL = https://resume.dialen.com.ua` (used for canonical URLs, sitemap, OG tags).
+4. **Settings → Domains**: add `resume.dialen.com.ua` and point the DNS record to Vercel (CNAME `cname.vercel-dns.com`).
+5. Optional: enable **Analytics** and **Speed Insights** in the project tabs — the components are already wired in `layout.tsx`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Or from the CLI: `npx vercel` (preview) and `npx vercel --prod`.
 
-## Learn More
+## Editing content
 
-To learn more about Next.js, take a look at the following resources:
+| What | Where |
+|---|---|
+| Name, contacts, intro, stats, skills, experience, NDA case studies | `src/data/profile.ts` |
+| Projects (titles, stack, links, order, featured) | `src/data/projects.ts` |
+| Project screenshots | `public/work/<slug>.webp` (cover 16:10) and `<slug>-full.webp` (full page) |
+| Image sizes & blur placeholders | `src/data/media.json` (regenerate when adding images) |
+| CV | `public/Olena-Shyhalevska-CV.pdf` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Technical notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Static by default**: home and all 35 project pages are prerendered at build time (`generateStaticParams`) → served from Vercel's CDN.
+- **Images**: source PNGs (113 MB) were pre-compressed to WebP (9 MB); `next/image` then serves AVIF/WebP at responsive widths with blur placeholders.
+- **Animation**: all GSAP code runs inside `useGSAP` (auto-cleanup) and `gsap.matchMedia`, so `prefers-reduced-motion` users get a static, fully readable site with native scrolling. Heavy effects (pinned horizontal scroll, custom cursor, magnetic buttons) are desktop/fine-pointer only.
+- **Smooth scroll**: Lenis is driven by `gsap.ticker` so it shares one RAF loop with ScrollTrigger.
+- **SEO**: metadata + Open Graph per page, generated OG image, `sitemap.xml`, `robots.txt`, JSON-LD `Person`.
+- **A11y**: skip link, semantic landmarks, focus-visible styles, `aria-pressed` filters, real links and buttons.
